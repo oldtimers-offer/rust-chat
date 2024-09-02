@@ -1,0 +1,11 @@
+- cargo new rust-chat (remove src and create workspace)
+
+- cargo new backend
+
+- cargo new frontend
+
+- cargo new common --lib
+
+- add rocket to backend
+
+- cargo run --bin backend
