@@ -9,3 +9,7 @@
 - add rocket to backend
 
 - cargo run --bin backend
+
+- take info from rocket ws website
+
+- in browser (inspection) add in console (ws = new WebSocket('ws:127.0.0.1:800'))
