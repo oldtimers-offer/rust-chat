@@ -12,4 +12,16 @@
 
 - take info from rocket ws website
 
+- add ChatRoom in backend
+
 - in browser (inspection) add in console (ws = new WebSocket('ws://127.0.0.1:8000'))
+
+- cargo install trunk
+
+- rustup target add wasm32-unknown-unknown
+
+- cd frontend
+
+- trunk serve
+
+- add index.html
