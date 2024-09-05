@@ -1,14 +1,9 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+use chrono::NaiveDateTime;
+use serde::{Deserialize, Serialize};
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+#[derive(Serialize, Deserialize, Clone)]
+pub struct ChatMessages {
+    pub message: String,
+    pub author: String,
+    pub created_at: NaiveDateTime,
 }
