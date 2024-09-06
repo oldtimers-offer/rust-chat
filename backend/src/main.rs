@@ -4,6 +4,7 @@ use std::{
 };
 
 use chrono::Utc;
+use common::WebSocketMessage;
 use rocket::{
     futures::{stream::SplitSink, SinkExt, StreamExt},
     tokio::sync::Mutex,
@@ -37,10 +38,38 @@ impl ChatRoom {
             author: format!("User id:{}", user_id),
             created_at: Utc::now().naive_utc(),
         };
+
+        let websocket_message = WebSocketMessage {
+            message_type: common::WebSocketMessageType::NewMessage,
+            message: Some(chat_message),
+            users: None,
+        };
         let mut conns = self.connections.lock().await;
         for (_id, sink) in conns.iter_mut() {
             let _ = sink
-                .send(Message::Text(json!(chat_message).to_string()))
+                .send(Message::Text(json!(websocket_message).to_string()))
+                .await;
+        }
+    }
+
+    pub async fn broadcast_user_list(&self) {
+        let mut conns = self.connections.lock().await;
+
+        let mut users = vec![];
+
+        for (id, _) in conns.iter() {
+            users.push(format!("User #{}", id));
+        }
+
+        let websocket_message = WebSocketMessage {
+            message_type: common::WebSocketMessageType::UsersList,
+            message: None,
+            users: Some(users),
+        };
+
+        for (_id, sink) in conns.iter_mut() {
+            let _ = sink
+                .send(Message::Text(json!(websocket_message).to_string()))
                 .await;
         }
     }
@@ -53,12 +82,14 @@ fn chat<'r>(ws: WebSocket, tate: &'r State<ChatRoom>) -> Channel<'r> {
             let user_id = USER_ID_COUNTER.fetch_add(1, Ordering::Relaxed);
             let (ws_sink, mut ws_stream) = stream.split();
             tate.add(user_id, ws_sink).await;
+            tate.broadcast_user_list().await;
 
             while let Some(message) = ws_stream.next().await {
                 tate.broadcast_message(message?, user_id).await;
             }
 
             tate.remove(user_id).await;
+            tate.broadcast_user_list().await;
 
             Ok(())
         })
