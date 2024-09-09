@@ -1,9 +1,9 @@
-use common::ChatMessages;
+use common::ChatMessage;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub messages: Vec<ChatMessages>,
+    pub messages: Vec<ChatMessage>,
 }
 
 #[function_component(MessageList)]
