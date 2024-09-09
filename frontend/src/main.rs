@@ -17,6 +17,9 @@ fn App() -> Html {
     let users_handle = use_state(Vec::default);
     let users = (*users_handle).clone();
 
+    let usersname_handle = use_state(String::default);
+    let username = (*usersname_handle).clone();
+
     let ws = use_websocket("ws://127.0.0.1:8000".to_string());
 
     let mut cloned_messages = messages.clone();
@@ -34,6 +37,10 @@ fn App() -> Html {
                 WebSocketMessageType::UsersList => {
                     let users = websocket_message.users.expect("Missing users");
                     users_handle.set(users);
+                }
+                WebSocketMessageType::UsernameChange => {
+                    let username = websocket_message.username.expect("Missing username");
+                    usersname_handle.set(username);
                 }
             }
         }
@@ -57,7 +64,7 @@ fn App() -> Html {
         </div>
 
         <div class="row">
-             <SendDialog send_message_callback={send_message_callback} />
+             <SendDialog send_message_callback={send_message_callback} username = {username}/>
         </div>
         </>
      </div>
